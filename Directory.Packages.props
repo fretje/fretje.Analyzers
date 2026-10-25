@@ -26,6 +26,6 @@
       with a known vulnerability. Pinned here instead of adding a PackageReference to the test project.
       Remove once Microsoft.CodeAnalysis.CSharp.CodeFix.Testing no longer brings in a vulnerable version.
     -->
-    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
   </ItemGroup>
 </Project>
