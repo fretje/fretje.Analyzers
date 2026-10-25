@@ -50,5 +50,16 @@ and the README requirements. The version is written as a range (`[4.14.0,5.0.0)`
 The package version comes from the git tag (via [MinVer](https://github.com/adamralph/minver)); there is no
 version number to edit in the project files.
 
-One-time setup: create a nuget.org API key (scope: push, glob `fretje.Analyzers*`) and store it as the
-`NUGET_API_KEY` repository secret.
+One-time setup (nuget.org [Trusted Publishing](https://aka.ms/nuget/trusted-publishing), no API key needed):
+
+1. On nuget.org: user menu → **Trusted Publishing** → add a policy:
+   - Package owner: yourself (or your organization)
+   - Repository owner: `fretje`, Repository: `fretje.Analyzers`
+   - Workflow file: `publish.yml` (file name only)
+   - Environment: leave empty
+   - Scopes: allow publishing **new packages** and **new versions**, glob pattern `fretje.Analyzers`
+2. In the GitHub repo: Settings → Secrets and variables → Actions → add the secret `NUGET_USER` with your
+   nuget.org **profile name** (not your email address).
+
+A policy for a private GitHub repo is only temporarily active for 7 days until the first successful publish
+(restart the window on the Trusted Publishing page if it lapses). Public repos don't have this limitation.
