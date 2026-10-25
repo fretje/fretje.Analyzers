@@ -1,0 +1,54 @@
+name: Publish
+
+# Publishes to nuget.org and creates a GitHub release when a version tag is pushed:
+#   git tag v1.0.0 && git push origin v1.0.0
+#   git tag v1.1.0-preview.1 && git push origin v1.1.0-preview.1   (pre-release)
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write # create the GitHub release
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  TESTINGPLATFORM_TELEMETRY_OPTOUT: 1
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # MinVer derives the version from the tag
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Build
+        run: dotnet build fretje.Analyzers.slnx -c Release
+
+      - name: Test
+        run: dotnet test --solution fretje.Analyzers.slnx -c Release --no-build
+
+      - name: Pack
+        run: dotnet pack src/fretje.Analyzers/fretje.Analyzers.csproj -c Release --no-build -o artifacts
+
+      - name: Push to nuget.org
+        run: >
+          dotnet nuget push "artifacts/*.nupkg"
+          --api-key "${{ secrets.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=""
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then flags="--prerelease"; fi
+          gh release create "$GITHUB_REF_NAME" artifacts/*.nupkg --generate-notes --title "$GITHUB_REF_NAME" $flags

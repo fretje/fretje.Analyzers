@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      test-tooling:
+        patterns:
+          - "xunit*"
+          - "Microsoft.CodeAnalysis.CSharp.CodeFix.Testing"
+    # The analyzer must keep compiling against the OLDEST Roslyn it supports (see Directory.Packages.props),
+    # so only allow patch updates. Bump the Roslyn minimum by hand, deliberately.
+    ignore:
+      - dependency-name: "Microsoft.CodeAnalysis.CSharp.Workspaces"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

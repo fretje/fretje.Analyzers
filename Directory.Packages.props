@@ -1,0 +1,31 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!-- Lets a <PackageVersion> below override a *transitive* dependency without referencing it in a csproj. -->
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup Label="Analyzer">
+    <!--
+      Deliberately NOT the newest Roslyn: an analyzer must reference the OLDEST Roslyn it wants to support,
+      otherwise it fails to load in older compilers. 4.14.0 = Visual Studio 2022 17.14 / .NET SDK 9.0.300+
+      (and it keeps working in VS 2026 / .NET SDK 10). Roslyn 5.x would require VS 2026 / .NET SDK 10.
+      The range [4.14.0,5.0.0) resolves to 4.14.0 and stops the NuGet UI from offering 5.x as an update.
+      Microsoft.CodeAnalysis.Analyzers (RS* rules, release tracking) comes in transitively with this package.
+    -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="[4.14.0,5.0.0)" />
+    <PackageVersion Include="MinVer" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup Label="Tests">
+    <!-- xunit.v3 4.x: Microsoft Testing Platform v2, no VSTest packages needed -->
+    <PackageVersion Include="xunit.v3.mtp-v2" Version="4.0.2" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.4" />
+  </ItemGroup>
+  <ItemGroup Label="Transitive pins (security)">
+    <!--
+      Pulled in transitively by the Roslyn testing framework (most likely via NuGet.Packaging) at a version
+      with a known vulnerability. Pinned here instead of adding a PackageReference to the test project.
+      Remove once Microsoft.CodeAnalysis.CSharp.CodeFix.Testing no longer brings in a vulnerable version.
+    -->
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+  </ItemGroup>
+</Project>

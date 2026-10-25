@@ -1,0 +1,15 @@
+name: New rule / feature request
+description: Suggest a new analyzer, code fix, or improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What should the analyzer detect?
+      description: Include a short before/after code sample if a code fix makes sense.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it useful?
